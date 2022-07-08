@@ -21,22 +21,23 @@
     </div>
   </nav>
   <div class="container">
-    <div *ngIf="loadingService.isLoading$ | async" class="spinner-border" role="status" style="color: #0773d0;position: fixed;
-                top: 60px;
-                right: 360px;
-                z-index:1000">
-      <span class="sr-only"></span>
+    <div class="d-flex justify-content-center mt-4">
+      <div *ngIf="loadingService.isLoading$ | async" class="spinner-border" role="status">
+        <span class="sr-only"></span>
+      </div>
     </div>
     <div class="row">
       <div class="col-md-12 mt-3">
         <ng-container *ngSwitchCase="'APP_ERROR'">{{ state.error | json }}</ng-container>
+        <!--
         <ng-container *ngSwitchCase="'APP_LOADING'">
           <div class="d-flex justify-content-center mt-4">
             <div class="spinner-border" role="status">
               <span class="visually-hidden">Loading...</span>
             </div>
           </div>
-        </ng-container>
+        </ng-container>FF
+        -->
         <ng-container *ngSwitchCase="'APP_LOADED'">
           <h3>Check the User List</h3>
           <table class="table table-striped">
@@ -75,7 +76,17 @@
             No users found
           </div>
           <nav *ngIf="state.appData.data.page.content.length > 0" aria-label="Page navigation example">
-            <ul class="pagination justify-content-end">
+            <ul class="pagination justify-content-between">
+              <div class="row">
+                <select #size class="form-select form-select-sm col-sm-6" aria-label=".form-select-sm"
+                  (change)="changeAmountOfRecords(searchForm.value.name, toNumber(size.value))">
+                  <option [value]="10">Show 10 records</option>
+                  <option [value]="20">Show 20 records</option>
+                  <option [value]="25">Show 25 records</option>
+                </select>
+
+              </div>
+
               <li class="page-item pointer cursor-pointer" [ngClass]="0 == (currentPage$ | async) ? ' disabled' : ''">
                 <a (click)="goToNextOrPreviousPage('backward', searchForm.value.name)" class="page-link"
                   aria-label="Previous">
@@ -95,6 +106,7 @@
                   <span aria-hidd en="true">Next &raquo;</span>
                 </a>
               </li>
+
             </ul>
           </nav>
         </ng-container>

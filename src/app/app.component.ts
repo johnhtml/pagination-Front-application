@@ -21,7 +21,7 @@ export class AppComponent implements OnInit {
   constructor(private userSevice: UserService, public loadingService: LoadingService) { }
 
   ngOnInit(): void {
-    
+
     this.loadingService.loadingOn();
     this.usersState$ = this.userSevice.users$().pipe(
       map((response: ApiResponse<Page>) => {
@@ -32,10 +32,11 @@ export class AppComponent implements OnInit {
         return ({ appState: 'APP_LOADED', appData: response });
       }),
       startWith({ appState: 'APP_LOADING' }),
-      catchError((error: HttpErrorResponse) =>{ 
+      catchError((error: HttpErrorResponse) => {
         this.loadingService.loadingOff();
-        return of({ appState: 'APP_ERROR', error })}
-        )
+        return of({ appState: 'APP_ERROR', error })
+      }
+      )
     )
   }
 
@@ -50,11 +51,35 @@ export class AppComponent implements OnInit {
         return ({ appState: 'APP_LOADED', appData: response });
       }),
       startWith({ appState: 'APP_LOADED', appData: this.responseSubject.value }),
-      catchError((error: HttpErrorResponse) =>{ 
+      catchError((error: HttpErrorResponse) => {
         this.loadingService.loadingOff();
-        return of({ appState: 'APP_ERROR', error })}
-        )
+        return of({ appState: 'APP_ERROR', error })
+      }
+      )
     )
+  }
+
+  changeAmountOfRecords(name?: string, size: number = 10): void {
+    this.loadingService.loadingOn();
+    this.usersState$ = this.userSevice.users$(name, 0, size).pipe(
+      map((response: ApiResponse<Page>) => {
+        this.loadingService.loadingOff();
+        this.responseSubject.next(response);
+        this.currentPageSubject.next(response.data.page.number);
+        //console.log(response);
+        return ({ appState: 'APP_LOADED', appData: response });
+      }),
+      startWith({ appState: 'APP_LOADED', appData: this.responseSubject.value }),
+      catchError((error: HttpErrorResponse) => {
+        this.loadingService.loadingOff();
+        return of({ appState: 'APP_ERROR', error })
+      }
+      )
+    )
+  }
+
+  toNumber(number: string) {
+    return Number(number);
   }
 
   goToNextOrPreviousPage(direction?: string, name?: string): void {
